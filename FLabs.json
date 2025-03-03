@@ -1,0 +1,90 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Vnetname": {
+            "type": "string",
+            "metadata": {
+                "description": "Name for sandbox virtual network"
+            },
+            "defaultValue": "vnet01"
+        },
+        "vnetlocation": {
+            "type": "string",
+            "metadata": {
+                "description": "east us"
+            }
+        }
+    },
+
+    "functions": [],
+    "variables": {
+        "subnetOneName": "sadboxsubnet",
+        "subnetTwoName": "workloadsubnet",
+        "vnetaddress": "198.168.0.0/16",
+        "subnetOneAddress": "198.168.0.32/28",
+        "subnetTwoAddress": "198.168.0.16/28",
+        "NSG1Name": "subnet1NSG",
+        "NSG2Name": "subnet2NSG",
+        "vnet01NSGName": "vnet01NSG"
+    },
+    "resources": [
+        {
+            "name": "[variables('vnet01NSGName')]",
+            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+            "apiVersion": "2024-03-01",
+            "properties": {
+                "description": "nsgRuleDescription",
+                "protocol": "*",
+                "sourcePortRange": "nsgRuleSourcePortRange",
+                "destinationPortRange": "nsgRuleDestinationPortRange",
+                "sourceAddressPrefix": "nsgRuleSourceAddressPrefix",
+                "destinationAddressPrefix": "nsgRileDestinationAddressRange",
+                "access": "Allow",
+                "priority": 100,
+                "direction": "Inbound"
+            }
+        },
+        
+        {
+            "name": "[parameters('Vnetname')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2024-03-01",
+            "location": "[parameters('vnetlocation')]",
+            "tags": {
+                "displayName": "[parameters('Vnetname')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vnet01NSGName'))]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": "[variables('vnetaddress')]"
+            },
+
+                "subnets": [
+                    {
+                        "name": "[variables('subnetOneName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnetOneAddress')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NSG1Name'))]"
+                            }
+                        }
+                    },
+
+                    {
+                        "name": "[variables('subnetTwoName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnetTwoAddress')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NSG2Name'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {}
+}
