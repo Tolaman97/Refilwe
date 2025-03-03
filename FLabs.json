@@ -31,21 +31,79 @@
     "resources": [
         {
             "name": "[variables('vnet01NSGName')]",
-            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+            "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2024-03-01",
+            "location": "[parameters('vnetlocation')]",
             "properties": {
-                "description": "nsgRuleDescription",
-                "protocol": "*",
-                "sourcePortRange": "nsgRuleSourcePortRange",
-                "destinationPortRange": "nsgRuleDestinationPortRange",
-                "sourceAddressPrefix": "nsgRuleSourceAddressPrefix",
-                "destinationAddressPrefix": "nsgRileDestinationAddressRange",
-                "access": "Allow",
-                "priority": 100,
-                "direction": "Inbound"
+                "securityRules": [
+                    {
+                        "name": "nsgRule1",
+                        "properties": {
+                            "description": "description",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
             }
         },
-        
+
+        {
+            "name": "[variables('NSG1Name')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2024-03-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "nsgRule1",
+                        "properties": {
+                            "description": "description",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+
+        {
+            "name": "[variables('NSG2Name')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2024-03-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "nsgRule1",
+                        "properties": {
+                            "description": "description",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+
         {
             "name": "[parameters('Vnetname')]",
             "type": "Microsoft.Network/virtualNetworks",
