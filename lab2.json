@@ -1,0 +1,172 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Vnet1Name": {
+            "type": "string",
+            "metadata": {
+                "description": "Name for sandbox virtual network"
+            },
+            "defaultValue": "CoreServiceVnet"
+        },
+
+        "Vnet2Name": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            },
+            "defaultValue": "ManufacturingVnet"
+        },
+
+        "Vnet1SubnetOneName": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            },
+            "defaultValue": "SharedServiceSubnet"
+        },
+
+        "Vnet1SubnetTwoName": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            },
+            "defaultValue": "DataBaseSubnet"
+        },
+
+        
+        "Vnet2ubnetOneName": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            },
+            "defaultValue": "SensorSubnet1"
+        },
+
+
+        "Vnet2SubnetTwoName": {
+            "metadata": {
+                "description": "description"
+            },
+            "defaultValue": "SensorSubnet2"
+        },
+
+
+        "Vnet1Subnet1NSGName": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            },
+            "defaultValue": "SharedServiceSubnetNSG"
+        }
+
+    },
+    "functions": [],
+
+    "variables": {
+     "net1Subnet1AddressPrefix": "10.20.10.0/24",
+     "Vnet1Subnet2AddressPrefix": "10.20.20.0/24",
+     "Vnet1AddressPrefix": "10.20.0.0/16",
+     "Vnet2Subnet1AddressPrefix": "10.30.20.0/24",
+     "Vnet2Subnet2AddressPrefix": "10.30.21.0/24",
+     "Vnet2AddressPrefix": "10.30.0.0/16"
+    },
+
+    "resources": [
+        {
+            "name": "[parameters('Vnet1Subnet1NSG')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2024-03-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "nsgRule1",
+                        "properties": {
+                            "description": "description",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+
+        {
+            "name": "[parameters('vnet1Name')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2024-03-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "virtualNetwork1"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": "[variables('Vnet1AddressPrefix')]",
+                },
+
+                "subnets": [
+                    {
+                        "name": "[parameters('Vnet1SubnetOneName')]",
+                        "properties": {
+                            "addressPrefix": 
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "[parameters('Vnet1Subnet2Name')]",
+                        "properties": {
+                            "addressPrefix": "10.0.1.0/24",
+                        }
+                    }
+                ]
+            }
+        },
+
+        {
+            "name": "virtualNetwork1",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2024-03-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "virtualNetwork1"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.0.0.0/16"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "Subnet-1",
+                        "properties": {
+                            "addressPrefix": "10.0.0.0/24",
+                        }
+                    },
+                    {
+                        "name": "Subnet-2",
+                        "properties": {
+                            "addressPrefix": "10.0.1.0/24",
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {}
+}
