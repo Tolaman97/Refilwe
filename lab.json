@@ -59,6 +59,9 @@
             }
         }
     },
+    "variables": {
+
+    },
     "resources": [
         {
             "name": "[parameters('Vnet1Name')]",
@@ -115,7 +118,7 @@
             }
         },
         {
-            "name": "[concat(parameters('Vnet1Name'), '-to-', parameters('Vnet2Name'))]",
+            "name": "[concat(parameters('Vnet1Name'), '/peerTo-', parameters('Vnet2Name'))]",
             "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
             "apiVersion": "2024-03-01",
             "location": "[resourceGroup().location]",
@@ -133,7 +136,7 @@
             }
         },
         {
-            "name": "[concat(parameters('Vnet2Name'), '-to-', parameters('Vnet1Name'))]",
+            "name": "[concat(parameters('Vnet2Name'), '/peerTo-', parameters('Vnet1Name'))]",
             "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
             "apiVersion": "2024-03-01",
             "location": "[resourceGroup().location]",
