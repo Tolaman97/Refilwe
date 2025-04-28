@@ -1,0 +1,86 @@
+from flask import Flask, render_template, request
+import sqlite3
+import os
+
+app = Flask(__name__)
+
+# Define database path
+currentdir = os.path.dirname(os.path.abspath(__file__))
+db_path = os.path.join(currentdir, "reg_db.sqlite3")
+
+# Function to initialize database
+def init_db():
+    with sqlite3.connect(db_path) as conn:
+        cur = conn.cursor()
+        # Create users table
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL,
+                password TEXT NOT NULL
+            )
+        ''')
+        # Create appdata table
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS appdata (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL,
+                email TEXT NOT NULL,
+                age INTEGER NOT NULL,
+                phone INTEGER NOT NULL,
+                citycode INTEGER NOT NULL
+            )
+        ''')
+        conn.commit()
+
+# Initialize the database
+init_db()
+
+# Route for login page
+@app.route('/', methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        try:
+            user = request.form['username']
+            pwd = request.form['password']
+
+            with sqlite3.connect(db_path) as conn:
+                cur = conn.cursor()
+                cur.execute("INSERT INTO users (username, password) VALUES (?, ?)", (user, pwd))
+                conn.commit()
+
+            return render_template('application.html', username=user)
+
+        except Exception as e:
+            return f"An error occurred during login: {e}"
+
+    return render_template('login.html')
+
+# Route for application page
+@app.route('/application', methods=["GET", "POST"])
+def application():
+    if request.method == "POST":
+        try:
+            user = request.form['username']
+            email = request.form['email']
+            age = int(request.form['age'])
+            phone = int(request.form['phone'])
+            citycode = int(request.form['citycode'])
+
+            with sqlite3.connect(db_path) as conn:
+                cur = conn.cursor()
+                cur.execute(
+                    "INSERT INTO appdata (username, email, age, phone, citycode) VALUES (?, ?, ?, ?, ?)",
+                    (user, email, age, phone, citycode)
+                )
+                conn.commit()
+
+            return render_template('submitted.html', username=user)
+
+        except Exception as e:
+            return f"An error occurred: {e}"
+
+    return render_template('application.html')
+
+if __name__ == "__main__":
+    app.run(debug=True)
