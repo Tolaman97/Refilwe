@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-image: url('https://img.freepik.com/free-photo/empty-greenhouse-with-fresh-fully-grown-different-salad-types-ready-harvest-delivery-local-supermarket-store-nobody-hydroponic-enviroment-with-organic-food-being-grown-organically_482257-47482.jpg?t=st=1746822232~exp=1746825832~hmac=cf679a18d2362df1ceb66c4d14f011f579a26d14b369cf1357daa221bc254060&w=996');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            font-family: Arial, sans-serif;
+            color: black;
+        }
+
+        nav {
+            background-color: #28a745;
+            padding: 10px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #28a745;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            background-color: #218838;
+        }
+
+        .container {
+            text-align: center;
+            margin: 30px auto;
+            max-width: 600px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8); /* Transparent white */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .dashboard-button {
+            width: 150px;
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px;
+            background-color: #28a745;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .dashboard-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/about_us">About Us</a>
+        <a href="/contact_us">Contact Us</a>
+        <a href="/logout">Logout</a>
+    </nav>
+    <div class="container">
+        <h2>Welcome, {{ session['username'] }}</h2>
+        {% for sensor in access %}
+            <form action="{{ url_for('sensor_data', sensor_type=sensor) }}">
+                <button class="dashboard-button">{{ sensor.capitalize() }} Data</button>
+            </form>
+        {% endfor %}
+        {% if 'humidity' in access and 'temperature' in access and 'infrared' in access and 'ldr1' in access and 'ldr2' in access %}
+             <form action="{{ url_for('all_sensor_data') }}">
+                <button class="dashboard-button">All Sensor Data</button>
+             </form>
+        {% endif %}
+    </div>
+</body>
+</html>

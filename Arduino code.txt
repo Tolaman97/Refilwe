@@ -1,0 +1,130 @@
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
+
+// Pin configuration
+#define ONE_WIRE_BUS 14
+#define PIR_Pin 27
+const int LDR1_PIN = 34;
+const int LDR2_PIN = 39;
+const int HUMIDITY_PIN = 35;
+
+// WiFi credentials
+const char* ssid = "Renny";
+const char* password = "12345678";
+
+// Flask server endpoint
+const char* serverName = "http://192.168.226.150:5000/esp32";
+
+// Sensor setup
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+
+void setup() {
+  Serial.begin(9600);
+
+  // Initialize sensors
+  sensors.begin();
+  pinMode(PIR_Pin, INPUT);
+  pinMode(LDR1_PIN, INPUT);
+  pinMode(LDR2_PIN, INPUT);
+
+  // WiFi connection
+  Serial.println("Connecting to WiFi...");
+  WiFi.begin(ssid, password);
+  unsigned long startAttemptTime = millis();
+  const unsigned long timeout = 10000;
+
+  while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("\nWiFi connected. IP address: " + WiFi.localIP().toString());
+  } else {
+    Serial.println("\nFailed to connect to WiFi.");
+  }
+
+  Serial.println("System Initialized.");
+}
+
+void loop() {
+  // Read Sensors
+  int humidityValue = analogRead(HUMIDITY_PIN);
+
+  sensors.requestTemperatures();
+  float temperature = sensors.getTempCByIndex(0);
+
+  int ldr1Value = analogRead(LDR1_PIN);
+  int ldr2Value = analogRead(LDR2_PIN);
+
+  int motion_value = digitalRead(PIR_Pin); // RAW digital value from PIR
+
+  // Determine statuses
+  String tempStatus = (temperature >= 18 && temperature <= 30) ? "Normal" : "Upnormal";
+  String humStatus = (humidityValue >= 2000 && humidityValue <= 3000) ? "Normal" : "Upnormal";
+  String motionStatus = (motion_value == 1) ? "Detected" : "No Motion";
+  String ldr1Status = (ldr1Value >= 500 && ldr1Value <= 800) ? "Normal" : "Upnormal";
+  String ldr2Status = (ldr2Value >= 500 && ldr2Value <= 800) ? "Normal" : "Upnormal";
+
+  // Linear print
+  Serial.print("Humidity: ");
+  Serial.print(humidityValue);
+  Serial.print(" (");
+  Serial.print(humStatus);
+  Serial.print(") | Temp: ");
+  Serial.print(temperature);
+  Serial.print("°C (");
+  Serial.print(tempStatus);
+  Serial.print(") | Motion: ");
+  Serial.print(motion_value);
+  Serial.print(" (");
+  Serial.print(motionStatus);
+  Serial.print(") | LDR1: ");
+  Serial.print(ldr1Value);
+  Serial.print(" (");
+  Serial.print(ldr1Status);
+  Serial.print(") | LDR2: ");
+  Serial.print(ldr2Value);
+  Serial.print(" (");
+  Serial.print(ldr2Status);
+  Serial.println(")");
+
+  // Build JSON Payload 
+  String requestBody = "{";
+  requestBody += "\"humidity\": " + String(humidityValue) + ",";
+  requestBody += "\"temperature\": " + String(temperature) + ",";
+  requestBody += "\"motion\": \"" + String(motion_value) + "\","; 
+  requestBody += "\"ldr1\": " + String(ldr1Value) + ",";
+  requestBody += "\"ldr2\": " + String(ldr2Value);
+  requestBody += "}";
+
+  // POST to Flask Server 
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    http.begin(serverName);
+    http.addHeader("Content-Type", "application/json");
+
+    int httpResponseCode = http.POST(requestBody);
+    if (httpResponseCode > 0) {
+      Serial.println("POST Success. Response: " + http.getString());
+    } else {
+      Serial.println("Error in POST: " + String(httpResponseCode));
+    }
+
+    http.end();
+  } else {
+    Serial.println("WiFi not connected. Skipping POST.");
+  }
+
+  delay(2000); // 2-second delay
+}
+
+
+
+
+
+
+

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Sensor Data</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-image: url('https://img.freepik.com/free-photo/empty-greenhouse-with-fresh-fully-grown-different-salad-types-ready-harvest-delivery-local-supermarket-store-nobody-hydroponic-enviroment-with-organic-food-being-grown-organically_482257-47482.jpg?t=st=1746822232~exp=1746825832~hmac=cf679a18d2362df1ceb66c4d14f011f579a26d14b369cf1357daa221bc254060&w=996');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            font-family: Arial, sans-serif;
+            color: black;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #28a745;
+            padding: 10px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #28a745;
+        }
+
+        nav a:hover {
+            background-color: #218838;
+        }
+
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 20px auto;
+            width: 80%;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+
+        .top-button {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #28a745;
+            color: black;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/about_us">About Us</a>
+        <a href="/contact_us">Contact Us</a>
+    </nav>
+
+    <h2>All Sensor Data</h2>
+
+    <form action="{{ url_for('dashboard') }}" class="top-button">
+        <button type="submit">Back to Dashboard</button>
+    </form>
+
+    <div class="table-container">
+        <table>
+            <tr>
+                <th>Timestamp</th>
+                <th>Humidity</th>
+                <th>Temperature</th>
+                <th>Motion</th>
+                <th>LDR1</th>
+                <th>LDR2</th>
+            </tr>
+            {% for row in data %}
+            <tr>
+                <td>{{ row[0] }}</td>
+                <td>{{ row[1] }}</td>
+                <td>{{ row[2] }}</td>
+                <td>{{ row[3] }}</td>
+                <td>{{ row[4] }}</td>
+                <td>{{ row[5] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>
+
+
+
