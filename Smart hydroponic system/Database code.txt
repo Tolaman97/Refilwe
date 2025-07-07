@@ -1,0 +1,26 @@
+CREATE DATABASE hydroponic_db;
+USE hydroponic_db;
+CREATE TABLE sensor_data (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    humidity INT,
+    temperature FLOAT,
+    motion INT,
+    ldr1 INT,
+    ldr2 INT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+ );
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    access VARCHAR(255) NOT NULL
+);
+
+INSERT INTO users (username, password, access) VALUES
+('LEAGO', '1', 'humidity'),
+('LUNGILE', '2', 'temperature'),
+('REFILWE', '3', 'infrared'),
+('ZANELE', '4', 'ldr1'),
+('RIJO', '5', 'ldr2'),
+('admin', 'admin', 'humidity,temperature,infrared,ldr1,ldr2');
